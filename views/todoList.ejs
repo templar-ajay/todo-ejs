@@ -1,28 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('header'); -%>
+<div id="heading" class="box">
+  <h1><%= listTitle %></h1>
+</div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List</title>
-</head>
+<div class="container">
+  <% lists.forEach((x,i)=>{ %>
+  <form style="margin-left: 0" action="<%= x=="To-Do"?"/":x %>" method="get">
+    <button type="submit" name="<%= x %>" class="btn <%= ((x==listTitle.split(" List")[0])||x=="To-Do"&&!listTitle.includes("List"))?"selected":"" %> listName"><%= x %></button>
+  </form>
+  <% }) %>
+  <form class="lists" style="margin-left: 0">
+    <button class="btn addList" type="button" name="addList" style="padding: 10px 20px">
+      +
+    </button>
+  </form>
+</div>
 
-<body>
-    <h1>
-        <%= day %>
-    </h1>
-    <ul>
-        <% listItems.forEach((x,i)=>{ %>
-            <li>
-                <%= x %>
-            </li>
-            <% }) %>
-    </ul>
-    <form action="/" method="post">
-        <input type="text" name="newItem">
-        <input type="submit">
-    </form>
-</body>
+<div class="box">
+  <% listItems.forEach((x,i)=>{ %>
+  <div class="item">
+    <input type="checkbox" />
+    <p><%= x %></p>
+  </div>
+  <% }) %>
 
-</html>
+  <form class="item" action="<%= route %>" method="post">
+    <input type="text" name="newItem" placeholder="New Item" autocomplete="off" />
+    <button type="submit" name="button" value="<%= listTitle %>">+</button>
+  </form>
+</div>
+<%- include('footer'); -%>
