@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const _ = require("lodash");
@@ -9,7 +11,9 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://127.0.0.1:27017/todoListDB");
+mongoose.connect(
+  `mongodb+srv://ajay:${process.env.PASS}@cluster0.x1rvbqd.mongodb.net/TodoListDB?retryWrites=true&w=majority`
+);
 
 const itemSchema = {
   name: String,
@@ -106,4 +110,6 @@ app.post("/delete", (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("http://localhost:3000"));
+app.listen(process.env.PORT || 3000, () =>
+  console.log(`http://localhost:${process.env.PORT || 3000}`)
+);
