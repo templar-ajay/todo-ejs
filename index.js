@@ -1,84 +1,109 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const date = require(__dirname + "/date.js");
-
-const lists = ["To-Do"];
-// const listItemsArr = ;
-const itemsObj = { "/": ["Buy Food", "Cook Food", "Eat Food"] };
-
-const obj = {
-  workItems: [],
-  fag: [],
-};
+const mongoose = require("mongoose");
+const _ = require("lodash");
 
 const app = express();
+
 app.set("view engine", "ejs");
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-app.get("/newList", (req, res) => {
-  console.log(req.body);
+mongoose.connect("mongodb://127.0.0.1:27017/todoListDB");
 
-  res.redirect("/");
-});
+const itemSchema = {
+  name: String,
+};
 
-app.get("/", (req, res) => {
-  const day = date.getDate();
-  console.log("aya ki nahi aya", day);
-  res.render("todoList.ejs", {
-    listTitle: day,
-    listItems: itemsObj["/"],
-    lists: lists,
-    route: "/",
-  });
-});
+const Item = mongoose.model("Item", itemSchema);
 
-app.get("/:id", function (req, res) {
-  let word = req.params.id;
-  console.log(word);
-  if (lists.includes(word)) {
-    res.render("todoList.ejs", {
-      listTitle: word + " List",
-      listItems: itemsObj[word],
-      lists: lists,
-      route: "/post/" + word,
-    });
-  } else res.redirect("/");
-});
-app.post("/post/:id", function (req, res) {
-  let path = req.params.id;
-  console.log(path);
-  const newItem = req.body.newItem;
-  console.log("newItem", newItem);
-  itemsObj[path].push(newItem);
-  res.redirect("/" + path);
-});
+const item1 = new Item({ name: "Welcome to your To-do list" });
+const item2 = new Item({ name: "Hit the + button to add a new item" });
+const item3 = new Item({ name: "<-- Hit this to delete an item" });
 
-app.get("/about", (req, res) => {
-  res.render("about.ejs");
-});
+const defaultItems = [item1, item2, item3];
 
-app.post("/", (req, res) => {
-  const newItem = req.body.newItem;
-  if (req.body.button == "Work List") {
-    workItems.push(newItem);
-    res.redirect("/work");
-  } else {
-    itemsObj["/"].push(newItem);
+const listSchema = {
+  name: String,
+  items: [itemSchema],
+};
+
+// List Model
+const List = mongoose.model("List", listSchema);
+
+app.get("/", async (req, res) => {
+  // find items
+  const items = await Item.find({});
+  if (!items.length) {
+    Item.insertMany(defaultItems, console.log);
     res.redirect("/");
+  } else {
+    // const names = items.map((x) => x.name);
+    res.render("todoList", {
+      listTitle: "Today",
+      listItems: items,
+    });
   }
 });
 
-app.post("/newListItem", (req, res) => {
-  const newList = req.body.newListName;
-  lists.push(newList);
-  itemsObj[newList] = [];
-  console.log(lists);
-  console.log(itemsObj);
-  res.redirect("/");
+app.get("/:customListName", (req, res) => {
+  const customListName = _.capitalize(req.params.customListName);
+
+  List.findOne({ name: customListName }, (err, foundList) => {
+    if (!err) {
+      if (!foundList) {
+        //create a new list
+        const list = new List({ name: customListName, items: defaultItems });
+        list.save();
+        res.redirect("/" + customListName);
+      } else {
+        //show an existing list
+        res.render("list", {
+          listTitle: foundList.name,
+          newListItems: foundList.items,
+        });
+      }
+    }
+  });
 });
 
-app.listen(3000, () => {
-  console.log("app running at http://localhost:3000");
+app.post("/", (req, res) => {
+  // console.log(req.body);
+  const itemName = req.body.newItem;
+  const listName = req.body.list;
+
+  const item = new Item({ name: itemName });
+
+  if (listName === "Today") {
+    item.save();
+    res.redirect("/");
+  } else {
+    List.findOne({ name: listName }, (err, foundList) => {
+      foundList.items.push(item);
+      foundList.save();
+      res.redirect("/" + listName);
+    });
+  }
 });
+
+app.post("/delete", (req, res) => {
+  console.log(req.body);
+  const checkedItemId = req.body.checkbox;
+  const listName = req.body.listName;
+  if (listName === "Today") {
+    Item.findByIdAndDelete(checkedItemId, console.log);
+    res.redirect("/");
+  } else {
+    List.findOneAndUpdate(
+      { name: listName },
+      { $pull: { items: { _id: checkedItemId } } },
+      (err, foundList) => {
+        if (!err) {
+          res.redirect("/" + listName);
+        }
+      }
+    );
+  }
+});
+
+app.listen(3000, () => console.log("http://localhost:3000"));
