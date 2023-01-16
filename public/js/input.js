@@ -30,7 +30,7 @@ function input() {
 }
 
 function sendDataToServer(x) {
-  fetch("/newListItem", {
+  fetch("/newListName", {
     method: "POST",
     body: JSON.stringify({ newListName: x }),
     headers: { "Content-type": "application/json; charset=UTF-8" },

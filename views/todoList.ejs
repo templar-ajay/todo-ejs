@@ -5,11 +5,11 @@
 
 <div class="container">
   <% lists.forEach((x,i)=>{ %>
-  <form style="margin-left: 0" action="<%= x=="To-Do"?"/":x %>" method="get">
-    <button type="submit" name="<%= x %>" class="btn <%= ((x==listTitle.split(" List")[0])||x=="To-Do"&&!listTitle.includes("List"))?"selected":"" %> listName"><%= x %></button>
+  <form action="/<%= x %>" method="get">
+    <button type="submit" class="btn <%= ((x==listTitle.split(" List")[0])||x=="To-Do"&&!listTitle.includes("List"))?"selected":"" %> listName"><%= x %></button>
   </form>
   <% }) %>
-  <form class="lists" style="margin-left: 0">
+  <form class="lists">
     <button class="btn addList" type="button" name="addList" style="padding: 10px 20px">
       +
     </button>
