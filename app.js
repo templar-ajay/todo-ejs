@@ -1,4 +1,4 @@
-const dotenv = require("dotenv");
+require("dotenv").config();
 const express = require("express");
 const date = require(__dirname + "/date.js");
 const _ = require("lodash");
@@ -11,11 +11,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-dotenv.config();
-
 mongoose
   .connect(
-    `mongodb+srv://ajay:${process.env.PASS}@cluster0.x1rvbqd.mongodb.net/TodoListAdvanced?retryWrites=true&w=majority`
+    `mongodb+srv://ajay:${process.env.PASS}@cluster0.x1rvbqd.mongodb.net/?retryWrites=true&w=majority`
   )
   .catch(console.error);
 
