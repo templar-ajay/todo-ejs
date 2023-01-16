@@ -12,8 +12,8 @@ function f() {
         // write your logic
         sendDataToServer(inputText.value);
         console.log(inputText.value);
-        addButton.innerHTML = "+";
       }
+      addButton.innerHTML = "+";
       inputText.remove();
       f();
     };
