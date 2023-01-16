@@ -18,10 +18,14 @@
 
 <div class="box">
   <% listItems.forEach((x,i)=>{ %>
-  <div class="item">
-    <input type="checkbox" />
-    <p><%= x.name %></p>
-  </div>
+  <form action="/delete" method="post">
+    <div class="item">
+      <input type="checkbox" name="checkbox" value="<%=x._id%>" onchange="this.form.submit()" />
+      <p><%= x.name %></p>
+    </div>
+    <input type="hidden" name="listName" value="<%= listName %>" />
+  </form>
+
   <% }) %>
 
   <form class="item" action="<%= route %>" method="post">

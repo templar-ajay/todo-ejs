@@ -13,7 +13,7 @@ app.use(express.static("public"));
 
 mongoose
   .connect(
-    `mongodb+srv://ajay:${process.env.PASS}@cluster0.x1rvbqd.mongodb.net/?retryWrites=true&w=majority`
+    `mongodb+srv://ajay:${process.env.PASS}@cluster0.x1rvbqd.mongodb.net/TodoListAdvanced?retryWrites=true&w=majority`
   )
   .catch(console.error);
 
@@ -26,7 +26,7 @@ const listSchema = new mongoose.Schema({
   name: String,
   items: [itemSchema],
 });
-const List = new mongoose.model("List", listSchema);
+const List = mongoose.model("List", listSchema);
 
 (async () => {
   const itemsPresent = await Item.find({});
@@ -76,6 +76,7 @@ app.get("/:id", async function (req, res) {
         listItems: listItems,
         lists: lists.map((x) => x.name),
         route: "/post/To-Do",
+        listName: listName,
       });
     } else {
       res.render("todoList.ejs", {
@@ -83,6 +84,7 @@ app.get("/:id", async function (req, res) {
         listItems: listItems,
         lists: lists.map((x) => x.name),
         route: "/post/" + listName,
+        listName: listName,
       });
     }
   } else {
@@ -116,6 +118,24 @@ app.post("/newListName", (req, res) => {
   newList.save();
 
   res.redirect("/");
+});
+
+app.post("/delete", async (req, res) => {
+  console.log("delete Request REcieved");
+  const id = req.body.checkbox;
+  const listName = req.body.listName;
+
+  console.log("listName", listName);
+  console.log("listName", listName);
+
+  List.findOneAndUpdate(
+    { name: listName },
+    { $pull: { items: { _id: id } } },
+    (err, foundList) => {
+      console.log("foundList", foundList);
+      if (!err) res.redirect("/" + listName);
+    }
+  );
 });
 
 app.listen(process.env.PORT || 3000, () => {
