@@ -30,10 +30,10 @@ const listSchema = new mongoose.Schema({
 });
 const List = new mongoose.model("List", listSchema);
 
-// set initial data in database
 (async () => {
-  if (!(await Item.find().length)) {
-    // check if any data is present in database if not then insert default data
+  const itemsPresent = await Item.find({});
+  console.log("itemsPresent", itemsPresent);
+  if (!itemsPresent.length) {
     var item1 = new Item({ name: "Buy Food" });
     var item2 = new Item({ name: "Cook Food" });
     var item3 = new Item({ name: "Serve Food" });
@@ -41,9 +41,12 @@ const List = new mongoose.model("List", listSchema);
 
     Item.insertMany([item1, item2, item3, item4], console.log);
   }
-  if (!(await List.find().length)) {
+
+  const listPresent = await List.find({});
+  console.log("listPresent", listPresent);
+  if (!listPresent.length) {
     const list = new List({
-      name: "To-Do",
+      name: _.capitalize("To-do"),
       items: [item1, item2, item3, item4],
     });
 
@@ -51,53 +54,53 @@ const List = new mongoose.model("List", listSchema);
   }
 })();
 
-// const itemsObj = { "To-Do": ["Buy Food", "Cook Food", "Eat Food"] };
-
 app.get("/", (req, res) => {
-  res.redirect("/To-Do");
-  // console.log(itemsObj);
+  res.redirect("/To-do");
 });
 
 app.get("/:id", async function (req, res) {
-  // console.log(itemsObj);
-
-  ///////////////////////////////////
-
-  let listName = req.params.id;
+  let listName = _.capitalize(req.params.id);
   console.log(listName);
 
-  // const theList = await List.find({name:listName})
-  // console.log("List", theList);
-  // const listItems = await
+  const lists = await List.find({});
+  console.log("lists", lists);
 
-  if (listName == "To-Do") {
-    const day = date.getDate();
-    res.render("todoList.ejs", {
-      listTitle: day,
-      listItems: itemsObj["To-Do"],
-      lists: Lists(),
-      route: "/post/To-Do",
-    });
-  } else {
-    if (Lists().includes(listName)) {
+  const theList = lists.filter((x) => x.name == listName)[0];
+  if (theList != undefined) {
+    console.log("theList", theList);
+    const listItems = theList.items;
+    console.log("listItems", listItems);
+
+    if (listName == "To-do") {
+      const day = date.getDate();
+      res.render("todoList.ejs", {
+        listTitle: day,
+        listItems: listItems,
+        lists: lists.map((x) => x.name),
+        route: "/post/To-Do",
+      });
+    } else {
       res.render("todoList.ejs", {
         listTitle: listName + " List",
-        listItems: itemsObj[listName],
-        lists: Lists(),
+        listItems: listItems,
+        lists: lists.map((x) => x.name),
         route: "/post/" + listName,
       });
-    } else res.redirect("/To-Do");
+    }
+  } else {
+    res.redirect("/To-do");
   }
 });
 
-app.post("/post/:id", function (req, res) {
-  console.log(itemsObj);
-
-  let path = req.params.id;
+app.post("/post/:id", async function (req, res) {
+  let path = _.capitalize(req.params.id);
   console.log(path);
-  const newItem = req.body.newItem;
+
+  const newItem = new Item({ name: req.body.newItem });
   console.log("newItem", newItem);
-  itemsObj[path].push(newItem);
+
+  List.updateOne({ name: path }, { $push: { items: newItem } }, console.log);
+
   res.redirect("/" + path);
 });
 
@@ -108,20 +111,15 @@ app.get("/about", (req, res) => {
 });
 
 app.post("/newListName", (req, res) => {
-  console.log(itemsObj);
+  const newList = new List({
+    name: _.capitalize(req.body.newListName),
+    items: [],
+  });
+  newList.save();
 
-  const newList = req.body.newListName;
-  itemsObj[newList] = [];
-
-  console.log(Lists());
-  console.log(itemsObj);
   res.redirect("/");
 });
 
 app.listen(3000, () => {
   console.log("app running at http://localhost:3000");
 });
-
-function Lists() {
-  return Object.keys(itemsObj);
-}
