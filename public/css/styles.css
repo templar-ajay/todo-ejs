@@ -12,6 +12,7 @@ h1 {
 }
 
 .container {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,11 +29,15 @@ h1 {
   padding: 10px;
   margin: 5px;
   position: relative;
+  border: 3px solid #e4e9fd;
   border-radius: 10px;
   width: fit-content;
 }
+
 .selected {
-  border: 3px solid #ffffff;
+  box-shadow: 0px 0px 0px 1px #a683e3;
+  border: 3px solid white;
+  border-radius: 10px;
 }
 .new-list-input {
   outline: none;
@@ -125,4 +130,11 @@ footer {
   color: white;
   color: rgba(0, 0, 0, 0.5);
   text-align: center;
+}
+
+/* fixes squeezing of item add button on smaller screens */
+@media only screen and (max-width: 400px) {
+  input[type="text"] {
+    width: calc(100% / 400 * 325) !important;
+  }
 }

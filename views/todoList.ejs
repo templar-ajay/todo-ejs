@@ -6,7 +6,7 @@
 <div class="container">
   <% lists.forEach((x,i)=>{ %>
   <form action="/<%= x %>" method="get">
-    <button type="submit" class="btn <%= ((x==listTitle.split(" List")[0])||x=="To-Do"&&!listTitle.includes("List"))?"selected":"" %> listName"><%= x %></button>
+    <button type="submit" class="btn <%= ((x==listTitle.split(" List")[0])||x=="To-do"&&!listTitle.includes("List"))?"selected":"" %> listName"><%= x %></button>
   </form>
   <% }) %>
   <form class="lists">
@@ -15,6 +15,8 @@
     </button>
   </form>
 </div>
+
+
 
 <div class="box">
   <% listItems.forEach((x,i)=>{ %>
