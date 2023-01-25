@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="manifest" href="images/site.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/login.css">
+  <script src="js/input.js" defer></script>
+</head>
+
+<body>
+
+  <section>
+    <div class="container">
+      <div class="user signinBx">
+        <div class="imgBx"><img src="images/todoimg.png" alt="" /></div>
+        <div class="formBx">
+          <form action="/login" method='post'>
+            <!-- onsubmit="return false;" -->
+            <h2>Sign In</h2>
+            <input type="text" name="username" required placeholder="Username" />
+            <input type="password" name="password" required placeholder="Password" />
+            <input type="submit" name="" value="Login" />
+            <p class="signup">
+              Don't have an account ?
+              <a href="#" onclick="toggleForm();">Sign Up.</a>
+            </p>
+          </form>
+        </div>
+      </div>
+      <div class="user signupBx">
+        <div class="formBx">
+          <form action="/register" method="post">
+            <h2>Create an account</h2>
+            <!-- <input type=" text" name="" placeholder="Username" /> -->
+            <input type="email" id="reg-email" name="username" placeholder="Email Address" required />
+            <input type="password" id="reg-pass" name="password" placeholder="Create Password" required />
+            <div id="error" style="display: none;color: red;">passwords do not match</div>
+            <input type="password" id="confirm-pass" oninput="verify()" name="" placeholder="Confirm Password" required />
+            <input type="submit" id="register-submit" name="" value="Sign Up" />
+            <p class="signup">
+              Already have an account ?
+              <a href="#" onclick="toggleForm();">Sign in.</a>
+            </p>
+          </form>
+        </div>
+        <div class="imgBx"><img src="images/todoregister.png" alt="" /></div>
+      </div>
+    </div>
+  </section>
+  <script>
+    const toggleForm = () => {
+      const container = document.querySelector('.container');
+      container.classList.toggle('active');
+    };
+  </script>
+  <% if(showRegister){ %>
+  <script>
+    toggleForm()
+  </script>
+  <%}%>
+
+  <%- include('footer'); -%>

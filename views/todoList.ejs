@@ -1,4 +1,5 @@
 <%- include('header'); -%>
+
 <div id="heading" class="box">
   <h1><%= listTitle %></h1>
 </div>
@@ -25,7 +26,6 @@
     </div>
     <input type="hidden" name="listName" value="<%= listName %>" />
   </form>
-
   <% }) %>
 
   <form class="item" action="<%= route %>" method="post">
@@ -33,4 +33,5 @@
     <button type="submit" name="button" value="<%= listTitle %>">+</button>
   </form>
 </div>
+
 <%- include('footer'); -%>
