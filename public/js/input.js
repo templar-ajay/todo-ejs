@@ -1,6 +1,6 @@
 const addButton = document.querySelector(".addList");
 
-console.log("hi");
+console.log("hi :)");
 
 function f() {
   addButton.onclick = () => {
@@ -30,11 +30,11 @@ function input() {
 }
 
 function sendDataToServer(x) {
-  fetch("/newListName", {
+  fetch("/addNewList", {
     method: "POST",
     body: JSON.stringify({ newListName: x }),
     headers: { "Content-type": "application/json; charset=UTF-8" },
-  }).then(() => window.location.reload());
+  }).then(() => location.reload());
 }
 
 function showError(x = true) {
@@ -68,3 +68,27 @@ function verify(strong = false) {
     }
   }
 }
+
+const specialOne = document.querySelector(".special-btn");
+const specialForm = document.querySelector("#special-btn-form");
+specialForm?.setAttribute("onsubmit", "return false");
+
+const specialImg = document.querySelector(".special-btn img");
+specialOne?.addEventListener("click", (event) => {
+  if (specialImg.style.display == "none") {
+    specialImg.style.display = "";
+  } else if (specialImg.style.display == "") {
+    specialImg.style.display = "none";
+  }
+});
+
+const deleteListButton = document.querySelector("#deleteListButton");
+
+deleteListButton?.addEventListener("click", () => {
+  const listName = deleteListButton.getAttribute("list");
+  fetch("/deleteList", {
+    method: "POST",
+    body: JSON.stringify({ listName: listName }),
+    headers: { "Content-type": "application/json; charset=UTF-8" },
+  }).then(() => location.reload());
+});

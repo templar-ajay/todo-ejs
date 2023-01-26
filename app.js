@@ -1,3 +1,5 @@
+// make a video on youtube, about how to make a todo list app using ejs and express
+
 require("dotenv").config();
 const express = require("express");
 const date = require(__dirname + "/date.js");
@@ -6,9 +8,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
-// const { render } = require("ejs");
-// const path = require("path");
-// path.resolve("path", __dirname + "/path/");
+mongoose.set("strictQuery", false);
 
 const app = express();
 app.use(express.json());
@@ -51,30 +51,6 @@ const dataSchema = new mongoose.Schema({
 
 const Data = mongoose.model("Data", dataSchema);
 
-// (async () => {
-//   const itemsPresent = await Item.find({});
-//   console.log("itemsPresent", itemsPresent);
-//   if (!itemsPresent.length) {
-//     var item1 = new Item({ name: "Buy Food" });
-//     var item2 = new Item({ name: "Cook Food" });
-//     var item3 = new Item({ name: "Serve Food" });
-//     var item4 = new Item({ name: "Eat Food" });
-
-//     Item.insertMany([item1, item2, item3, item4], console.log);
-//   }
-
-//   const listPresent = await List.find({});
-//   console.log("listPresent", listPresent);
-//   if (!listPresent.length) {
-//     const list = new List({
-//       name: _.capitalize("To-do"),
-//       items: [item1, item2, item3, item4],
-//     });
-
-//     list.save(console.log);
-//   }
-// })();
-
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -91,7 +67,7 @@ passport.deserializeUser(User.deserializeUser());
 app.get("/", (req, res) => {
   if (req.isAuthenticated()) {
     res.redirect("/ToDo");
-  } else res.redirect("/register");
+  } else res.redirect("/login");
 });
 
 app.get("/register", (req, res) => {
@@ -115,64 +91,36 @@ app.get("/logout", function (req, res) {
   });
 });
 
-app.get("/app", function (req, res) {
-  if (req.isAuthenticated()) {
-    console.log("/app", req.user._id);
-    res.redirect("app/To-do/");
-  } else {
-    res.redirect("/login");
-  }
+app.get("/about", (req, res) => {
+  res.render("about.ejs");
 });
 
-app.get("/app/:listName/", async function (req, res) {
+app.get("/:listName", async function (req, res) {
   if (req.isAuthenticated()) {
-    app.use(express.static(__dirname + "/public/"));
-    // check if user is authenticated
-    if (!req.isAuthenticated()) res.redirect("/login");
-
     let listName = _.capitalize(req.params.listName);
-    console.log(listName);
+    // console.log(listName);
 
-    // let userName = req.params.username;
+    // console.log("req.user", req.user);
+    const { username } = req.user;
+    // console.log("req.user.username", username);
 
-    let userID = req.user._id;
-    console.log("req.user.id", userID);
-
-    // if (!userID) {
-    //   const theUser = await User.findOne({ username: userName });
-    //   userID = theUser._id;
-    //   console.log("got from database", userID);
-    // }
-
-    const data = await Data.findOne({ user_id: userID });
-    console.log(data);
+    const data = await Data.findOne({ username: username });
+    // console.log("data", data);
 
     const lists = data.lists;
 
     const theList = lists.filter((x) => x.name == listName)[0];
     if (theList != undefined) {
-      console.log("theList", theList);
+      // console.log("theList", theList);
       const listItems = theList.items;
-      console.log("listItems", listItems);
+      // console.log("listItems", listItems);
 
-      if (listName == "To-do") {
-        const day = date.getDate();
-        res.render("todoList", {
-          listTitle: day,
-          listItems: listItems,
-          lists: lists.map((x) => x.name),
-          route: "app/post/To-do",
-          listName: listName,
-        });
-      } else {
-        res.render("todoList", {
-          listTitle: listName + " List",
-          listItems: listItems,
-          lists: lists.map((x) => x.name),
-          route: "app/post/" + listName,
-          listName: listName,
-        });
-      }
+      res.render("todoList", {
+        listTitle: listName == "To-do" ? date.getDate() : `${listName} List`,
+        lists: lists.map((x) => x.name),
+        listItems: listItems,
+        listName: listName,
+      });
     } else {
       res.redirect("/To-do");
     }
@@ -183,7 +131,7 @@ app.get("/app/:listName/", async function (req, res) {
 
 app.post("/register", function (req, res) {
   const { username, password } = req.body;
-  console.log("register request received ");
+  // console.log("register request received ");
   User.register({ username: username }, password, function (err) {
     if (err) {
       console.log(err);
@@ -192,7 +140,7 @@ app.post("/register", function (req, res) {
     } else {
       passport.authenticate("local")(req, res, function (err, user) {
         const theUser = req.user;
-        console.log(req.user);
+        // console.log(req.user);
 
         const item1 = new Item({ name: "Welcome to To-Do List" });
         const item2 = new Item({
@@ -202,17 +150,21 @@ app.post("/register", function (req, res) {
           name: "add new item by clicking the add button",
         });
 
-        // Item.insertMany([item1, item2, item3], console.log);
+        Item.insertMany([item1, item2, item3], (err, results) => {
+          if (err) console.log(err);
+        });
 
         const todo_list = new List({
           name: _.capitalize("To-do"),
           items: [item1, item2, item3],
         });
 
-        // todo_list.save(console.log);
+        todo_list.save((err) => {
+          if (err) console.log(err);
+        });
 
         const data = new Data({
-          user_id: theUser._id,
+          username: theUser.username,
           lists: [todo_list],
         });
 
@@ -220,8 +172,8 @@ app.post("/register", function (req, res) {
           if (err) {
             console.log(err);
           } else {
-            console.log(data);
-            res.redirect("/app");
+            // console.log(data);
+            res.redirect("/To-do");
           }
         });
       });
@@ -242,98 +194,122 @@ app.post("/login", function (req, res) {
       res.redirect("/register");
     } else {
       passport.authenticate("local")(req, res, function () {
-        res.redirect("/app");
+        res.redirect("/To-do");
       });
     }
   });
+});
+
+app.post("/delete", async (req, res) => {
+  // console.log("delete Request Received");
+  const { checkbox: checkboxID, listName } = req.body;
+  const { username } = req.user;
+  const itemId = mongoose.Types.ObjectId(checkboxID);
+
+  Data.findOneAndUpdate(
+    {
+      username: username,
+    },
+    { $pull: { "lists.$[].items": { _id: itemId } } },
+    (err, foundList) => {
+      console.log(err, foundList);
+      if (!err) {
+        res.redirect("/" + listName);
+      } else {
+        console.log(err);
+        res.send(
+          "some error occurred while deleting the item, please try restarting the app. If the error persists, email the developer at templar.command0@gmail.com"
+        );
+      }
+    }
+  );
+});
+
+app.post("/addNewList", (req, res) => {
+  console.log("add new user request received");
+  if (req.isAuthenticated()) {
+    const { username } = req.user;
+    const { newListName } = req.body;
+    const newList = new List({
+      name: _.capitalize(req.body.newListName),
+      items: [],
+    });
+    // newList.save();
+
+    Data.updateOne(
+      {
+        username: username,
+      },
+      { $push: { lists: newList } },
+      (err, result) => {
+        console.log(err);
+        if (!err) {
+          console.log(newList, "added for user", username);
+          res.redirect("/To-do");
+        }
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
+});
+
+app.post("/deleteList", (req, res) => {
+  const { username } = req.user;
+  const { listName } = req.body;
+  if (req.isAuthenticated()) {
+    //
+    Data.findOneAndUpdate(
+      {
+        username: username,
+      },
+      { $pull: { lists: { name: listName } } },
+      (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          res.redirect("/");
+        }
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
+});
+
+app.post("/:listName", async function (req, res) {
+  if (req.isAuthenticated()) {
+    const { username } = req.user;
+    let listName = _.capitalize(req.params.listName);
+    // console.log(listName);
+    const { newItem } = req.body;
+    const item = new Item({ name: newItem });
+    item.save();
+
+    // console.log("newItem", item);
+
+    Data.updateOne(
+      {
+        username: username,
+        "lists.name": listName,
+      },
+      { $push: { "lists.$.items": item } },
+      (err, result) => {
+        if (!err) {
+          res.redirect("/" + listName);
+        } else {
+          console.log("err while adding list item", err);
+          res.send(
+            "some error occurred while adding the item, please try restarting the app. If the error persists, email the developer at templar.command0@gmail.com"
+          );
+        }
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`app running at http://localhost:${process.env.PORT || "3000"}`);
 });
-
-//////////////////////////////////////////////////////////////////////////////////
-
-/*
-app.get("/:id", async function (req, res) {
-  let listName = _.capitalize(req.params.id);
-  console.log(listName);
-
-  const lists = await List.find({});
-  console.log("lists", lists);
-
-  const theList = lists.filter((x) => x.name == listName)[0];
-  if (theList != undefined) {
-    console.log("theList", theList);
-    const listItems = theList.items;
-    console.log("listItems", listItems);
-
-    if (listName == "To-do") {
-      const day = date.getDate();
-      res.render("todoList.ejs", {
-        listTitle: day,
-        listItems: listItems,
-        lists: lists.map((x) => x.name),
-        route: "/post/To-Do",
-        listName: listName,
-      });
-    } else {
-      res.render("todoList.ejs", {
-        listTitle: listName + " List",
-        listItems: listItems,
-        lists: lists.map((x) => x.name),
-        route: "/post/" + listName,
-        listName: listName,
-      });
-    }
-  } else {
-    res.redirect("/To-do");
-  }
-});
-
-app.post("/post/:id", async function (req, res) {
-  let path = _.capitalize(req.params.id);
-  console.log(path);
-
-  const newItem = new Item({ name: req.body.newItem });
-  console.log("newItem", newItem);
-
-  List.updateOne({ name: path }, { $push: { items: newItem } }, console.log);
-
-  res.redirect("/" + path);
-});
-
-app.get("/about", (req, res) => {
-  console.log(itemsObj);
-
-  res.render("about.ejs");
-});
-
-app.post("/newListName", (req, res) => {
-  const newList = new List({
-    name: _.capitalize(req.body.newListName),
-    items: [],
-  });
-  newList.save();
-
-  res.redirect("/");
-});
-
-app.post("/delete", async (req, res) => {
-  console.log("delete Request Received");
-  const id = req.body.checkbox;
-  const listName = req.body.listName;
-
-  console.log("listName", listName);
-  console.log("listName", listName);
-
-  List.findOneAndUpdate(
-    { name: listName },
-    { $pull: { items: { _id: id } } },
-    (err, foundList) => {
-      console.log("foundList", foundList);
-      if (!err) res.redirect("/" + listName);
-    }
-  );
-});
-*/

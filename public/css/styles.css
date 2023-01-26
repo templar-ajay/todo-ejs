@@ -27,7 +27,7 @@ h1 {
   color: #ffffff;
   display: inline-block;
   padding: 10px;
-  margin: 5px;
+  /* margin: 5px; */
   position: relative;
   border: 3px solid #e4e9fd;
   border-radius: 10px;
@@ -137,4 +137,21 @@ footer {
   input[type="text"] {
     width: calc(100% / 400 * 325) !important;
   }
+}
+
+.flex {
+  display: flex;
+  justify-content: space-around;
+}
+
+.icon {
+  margin-top: 5%;
+  width: 23%;
+  cursor: pointer;
+}
+
+.special-btn {
+  border-radius: 10px;
+  margin: 5px;
+  z-index: 1000;
 }

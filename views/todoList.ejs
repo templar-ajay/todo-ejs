@@ -5,9 +5,19 @@
 </div>
 
 <div class="container">
-  <% lists.forEach((x,i)=>{ %>
-  <form action="/<%= x %>" method="get">
-    <button type="submit" class="btn <%= ((x==listTitle.split(" List")[0])||x=="To-do"&&!listTitle.includes("List"))?"selected":"" %> listName"><%= x %></button>
+  <% lists.forEach((list,i)=>{ %>
+  <form action="/<%= list %>" method="get" id="<%=list==listName?'special-btn-form':'' %>">
+    <div id="" class=" <%= list==listName? 'special-btn':'' %>">
+      <div class=" flex-child">
+        <button type="submit" class="btn <%= ((list==listTitle.split(" List")[0])||list=="To-do"&&!listTitle.includes("List"))?"selected":"" %> listName"><%= list %></button>
+      </div>
+      <% if(list==listName){ %>
+      <div class="flex">
+        <img id="deleteListButton" list="<%= listName %>" style="display: none;" class="icon" src="images/delete.png" />
+      </div>
+      <% } %>
+    </div>
+
   </form>
   <% }) %>
   <form class="lists">
@@ -18,17 +28,17 @@
 </div>
 
 <div class="box">
-  <% listItems.forEach((x,i)=>{ %>
+  <% listItems.forEach((item,i)=>{ %>
   <form action="/delete" method="post">
     <div class="item">
-      <input type="checkbox" name="checkbox" value="<%=x._id%>" onchange="this.form.submit()" />
-      <p><%= x.name %></p>
+      <input type="checkbox" name="checkbox" value="<%=item._id%>" onchange="this.form.submit()" />
+      <p><%= item.name %></p>
     </div>
     <input type="hidden" name="listName" value="<%= listName %>" />
   </form>
   <% }) %>
 
-  <form class="item" action="<%= route %>" method="post">
+  <form class="item" action="/<%= listName %>" method="post">
     <input type="text" name="newItem" placeholder="New Item" autocomplete="off" />
     <button type="submit" name="button" value="<%= listTitle %>">+</button>
   </form>
