@@ -11,7 +11,7 @@
       <div class=" flex-child">
         <button type="submit" class="btn <%= ((list==listTitle.split(" List")[0])||list=="To-do"&&!listTitle.includes("List"))?"selected":"" %> listName"><%= list %></button>
       </div>
-      <% if(list==listName){ %>
+      <% if(list==listName &&(list!="To-do")){ %>
       <div class="flex">
         <img id="deleteListButton" list="<%= listName %>" style="display: none;" class="icon" src="images/delete.png" />
       </div>

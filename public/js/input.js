@@ -81,9 +81,9 @@ specialForm?.setAttribute("onsubmit", "return false");
 
 const specialImg = document.querySelector(".special-btn img");
 specialOne?.addEventListener("click", (event) => {
-  if (specialImg.style.display == "none") {
+  if (specialImg?.style.display == "none") {
     specialImg.style.display = "";
-  } else if (specialImg.style.display == "") {
+  } else if (specialImg?.style.display == "") {
     specialImg.style.display = "none";
   }
 });
