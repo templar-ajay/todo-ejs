@@ -56,7 +56,9 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 
-userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose, {
+  IncorrectPasswordError: "'Password or username are incorrect'",
+});
 
 const User = mongoose.model("User", userSchema);
 
@@ -192,12 +194,14 @@ app.post("/login", function (req, res) {
     if (err) {
       console.log(err);
       res.redirect("/register");
+      return next(err);
     } else {
       passport.authenticate("local")(req, res, function () {
         res.redirect("/To-do");
       });
     }
   });
+  // res.redirect("/To-do");
 });
 
 app.post("/delete", async (req, res) => {

@@ -30,11 +30,17 @@ function input() {
 }
 
 function sendDataToServer(x) {
-  fetch("/addNewList", {
-    method: "POST",
-    body: JSON.stringify({ newListName: x }),
-    headers: { "Content-type": "application/json; charset=UTF-8" },
-  }).then(() => location.reload());
+  if (preventRouteClash(x)) {
+    fetch("/addNewList", {
+      method: "POST",
+      body: JSON.stringify({ newListName: x }),
+      headers: { "Content-type": "application/json; charset=UTF-8" },
+    }).then(() => location.reload());
+  } else {
+    alert(
+      `your new list name "${x}" is clashing with one of our route names, please choose a new list name`
+    );
+  }
 }
 
 function showError(x = true) {
@@ -92,3 +98,14 @@ deleteListButton?.addEventListener("click", () => {
     headers: { "Content-type": "application/json; charset=UTF-8" },
   }).then(() => location.reload());
 });
+
+function preventRouteClash(newListName) {
+  return ![
+    "delete",
+    "login",
+    "register",
+    "about",
+    "deletelist",
+    "addnewlist",
+  ].includes(newListName.toLowerCase());
+}
