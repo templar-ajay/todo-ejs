@@ -1,4 +1,5 @@
 # yeah buddy let's go
+# this file is for deploying project on google cloud
 runtime: nodejs
 env: flex
 
