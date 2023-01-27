@@ -26,6 +26,7 @@ function input() {
   input.setAttribute("type", "text");
   input.id = "newListName";
   input.classList.add("new-list-input");
+  input.setAttribute("autocomplete", "off");
   return input;
 }
 

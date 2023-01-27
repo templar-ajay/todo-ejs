@@ -5,3 +5,5 @@ todo list app using -
 - ejs
 - ExpressJS
 - Passport Local Mongoose Authentication
+
+and it's deployed on google cloud

@@ -37,6 +37,26 @@ const itemSchema = new mongoose.Schema({
   name: String,
 });
 const Item = mongoose.model("Item", itemSchema);
+const item1 = new Item({ name: "Welcome to To-Do List" });
+const item2 = new Item({
+  name: "create a new list by tapping the + icon on the right of To-do ⬆️",
+});
+const item3 = new Item({
+  name: "to delete the current list tap on the list Name, a delete icon will magically appear 🪄",
+});
+const item4 = new Item({
+  name: "add new item by clicking the + button below ↘️",
+});
+const item5 = new Item({
+  name: "delete an item by ticking the checkbox",
+});
+const item6 = new Item({
+  name: "Happy Hunting 🔱",
+});
+
+Item.insertMany([item1, item2, item3, item4, item5, item6], (err, results) => {
+  if (err) console.log(err);
+});
 
 const listSchema = new mongoose.Schema({
   name: String,
@@ -144,21 +164,9 @@ app.post("/register", function (req, res) {
         const theUser = req.user;
         // console.log(req.user);
 
-        const item1 = new Item({ name: "Welcome to To-Do List" });
-        const item2 = new Item({
-          name: "delete an item by ticking the checkbox",
-        });
-        const item3 = new Item({
-          name: "add new item by clicking the add button",
-        });
-
-        Item.insertMany([item1, item2, item3], (err, results) => {
-          if (err) console.log(err);
-        });
-
         const todo_list = new List({
           name: _.capitalize("To-do"),
-          items: [item1, item2, item3],
+          items: [item1, item2, item3, item4, item5, item6],
         });
 
         todo_list.save((err) => {
