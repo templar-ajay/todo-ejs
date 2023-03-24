@@ -224,7 +224,10 @@ app.post("/delete", async (req, res) => {
     },
     { $pull: { "lists.$[].items": { _id: itemId } } },
     (err, foundList) => {
-      console.log(err, foundList);
+      if (!err) {
+        console.log(err);
+      }
+      // console.log( foundList);
       if (!err) {
         res.redirect("/" + listName);
       } else {
@@ -238,7 +241,7 @@ app.post("/delete", async (req, res) => {
 });
 
 app.post("/addNewList", (req, res) => {
-  console.log("add new user request received");
+  // console.log("add new user request received");
   if (req.isAuthenticated()) {
     const { username } = req.user;
     const { newListName } = req.body;
@@ -256,7 +259,7 @@ app.post("/addNewList", (req, res) => {
       (err, result) => {
         console.log(err);
         if (!err) {
-          console.log(newList, "added for user", username);
+          // console.log(newList, "added for user", username);
           res.redirect("/To-do");
         }
       }
