@@ -1,9 +1,9 @@
 # [Click Me](https://todo-list-thesaiyan.onrender.com)
 
-todo list app using -
+To-Do List App:
 
-- ejs
-- ExpressJS
-- Passport Local Mongoose Authentication
-
-and it's deployed on google cloud
+- Templating engine: ejs
+- server: ExpressJS
+- Authentication: Passport Local Mongoose
+- database: MongoDB
+- deployment: Google Cloud & onrender.com
