@@ -4,6 +4,6 @@ To-Do List App:
 
 - Templating engine: ejs
 - server: ExpressJS
-- Authentication: Passport Local Mongoose
+- Authentication package : Passport Local Mongoose
 - database: MongoDB
 - deployment: Google Cloud & onrender.com
